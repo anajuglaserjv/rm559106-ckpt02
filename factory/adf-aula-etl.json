@@ -1,0 +1,9 @@
+{
+	"name": "adf-aula-etl",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "39e2f44a-b763-4505-83c7-aff17192d1c6",
+		"tenantId": "11dbbfe2-89b8-4549-be10-cec364e59551"
+	}
+}
