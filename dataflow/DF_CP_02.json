@@ -1,0 +1,185 @@
+{
+	"name": "DF_CP_02",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "raw",
+						"type": "DatasetReference"
+					},
+					"name": "DBCLIENTE"
+				},
+				{
+					"dataset": {
+						"referenceName": "raw",
+						"type": "DatasetReference"
+					},
+					"name": "DBCLIFISICA"
+				},
+				{
+					"dataset": {
+						"referenceName": "raw",
+						"type": "DatasetReference"
+					},
+					"name": "DBENDCLI"
+				},
+				{
+					"dataset": {
+						"referenceName": "raw",
+						"type": "DatasetReference"
+					},
+					"name": "DBLOGRADOURO"
+				},
+				{
+					"dataset": {
+						"referenceName": "raw",
+						"type": "DatasetReference"
+					},
+					"name": "DBBAIRRO"
+				},
+				{
+					"dataset": {
+						"referenceName": "raw",
+						"type": "DatasetReference"
+					},
+					"name": "DBCIDADE"
+				},
+				{
+					"dataset": {
+						"referenceName": "raw",
+						"type": "DatasetReference"
+					},
+					"name": "DBESTADO"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "join3"
+				},
+				{
+					"name": "join4"
+				},
+				{
+					"name": "join5"
+				},
+				{
+					"name": "join6"
+				},
+				{
+					"name": "join7"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          NR_CLIENTE as short,",
+				"          NM_CLIENTE as string,",
+				"          QT_ESTRELAS as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DBCLIENTE",
+				"source(output(",
+				"          NR_CLIENTE as short,",
+				"          DT_NASCIMENTO as string,",
+				"          FL_SEXO_BIOLOGICO as string,",
+				"          DS_GENERO as string,",
+				"          NR_CPF as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DBCLIFISICA",
+				"source(output(",
+				"          NR_CLIENTE as short,",
+				"          CD_LOGRADOURO_CLI as short,",
+				"          NR_END as short,",
+				"          DS_COMPLEMENTO_END as string,",
+				"          DT_INICIO as string,",
+				"          DT_TERMINO as string,",
+				"          ST_END as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DBENDCLI",
+				"source(output(",
+				"          CD_LOGRADOURO as short,",
+				"          CD_BAIRRO as short,",
+				"          NM_LOGRADOURO as string,",
+				"          NR_CEP as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DBLOGRADOURO",
+				"source(output(",
+				"          CD_BAIRRO as short,",
+				"          CD_CIDADE as short,",
+				"          NM_BAIRRO as string,",
+				"          NM_ZONA_BAIRRO as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DBBAIRRO",
+				"source(output(",
+				"          CD_CIDADE as short,",
+				"          SG_ESTADO as string,",
+				"          NM_CIDADE as string,",
+				"          CD_IBGE as integer,",
+				"          NR_DDD as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DBCIDADE",
+				"source(output(",
+				"          SG_ESTADO as string,",
+				"          NM_ESTADO as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DBESTADO",
+				"DBCLIENTE, DBCLIFISICA join(DBCLIENTE@NR_CLIENTE == DBCLIFISICA@NR_CLIENTE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"DBENDCLI, DBCLIENTE join(DBENDCLI@NR_CLIENTE == DBCLIENTE@NR_CLIENTE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"DBLOGRADOURO, DBENDCLI join(CD_LOGRADOURO == CD_LOGRADOURO_CLI,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join3",
+				"DBBAIRRO, DBLOGRADOURO join(DBBAIRRO@CD_BAIRRO == DBLOGRADOURO@CD_BAIRRO,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join4",
+				"DBCIDADE, DBBAIRRO join(DBCIDADE@CD_CIDADE == CD_BAIRRO,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join5",
+				"DBESTADO, DBCIDADE join(DBESTADO@SG_ESTADO == DBCIDADE@SG_ESTADO,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join6",
+				"join1, join2 join(DBCLIENTE@NR_CLIENTE == DBENDCLI@NR_CLIENTE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join7"
+			]
+		}
+	}
+}
